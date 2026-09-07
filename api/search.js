@@ -190,3 +190,13 @@ return res.status(200).json({
   mode,
   answer: answer.trim()
 });
+
+  } catch (error) {
+    console.error("SEARCH ERROR:", error);
+
+    return res.status(500).json({
+      error: "Search failed.",
+      details: error.message
+    });
+  }
+};
