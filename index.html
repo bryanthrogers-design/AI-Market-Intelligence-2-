@@ -228,12 +228,105 @@ function navActive(name){
 function showHome(){activate('homeView');navActive('home')}
 function showDiscover(){activate('discoverView');navActive('discover')}
 function showPlaceholder(name){document.getElementById('placeholderTitle').textContent=name;activate('placeholderView');navActive(name.toLowerCase())}
-function runSearch(e){
+async function runSearch(e) {
   e.preventDefault();
-  const q=document.getElementById('query').value.trim();
-  if(!q)return;
-  document.getElementById('discoverTitle').textContent='Search: '+q;
-  showDiscover();navActive('discover');
+
+  const input = document.getElementById("query");
+  const query = input.value.trim();
+
+  if (!query) return;
+
+  const mode =
+    document.getElementById("deepBtn").classList.contains("active")
+      ? "deep"
+      : "quick";
+
+  document.getElementById("discoverTitle").textContent =
+    "Searching: " + query;
+
+  showDiscover();
+  navActive("discover");
+
+  const detailCard =
+    document.querySelector("#discoverView .detail-card");
+
+  detailCard.innerHTML = `
+    <div class="eyebrow">Searching</div>
+
+    <h2>Finding intelligence...</h2>
+
+    <p class="detail-lede">
+      Searching the web and evaluating developments for your question.
+    </p>
+  `;
+
+  try {
+    const response = await fetch("/api/search", {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        query,
+        mode
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Search failed."
+      );
+    }
+
+    detailCard.innerHTML = `
+      <div class="eyebrow">
+        Search complete
+      </div>
+
+      <h2>${escapeHtml(query)}</h2>
+
+      <p class="detail-lede">
+        ${
+          mode === "deep"
+            ? "Deep Search"
+            : "Quick Search"
+        }
+        results from the intelligence engine.
+      </p>
+
+      <div class="search-result-output">
+        ${formatSearchOutput(data.answer)}
+      </div>
+
+      <button class="back" onclick="showHome()">
+        ← Back to search
+      </button>
+    `;
+
+  } catch (error) {
+
+    detailCard.innerHTML = `
+      <div class="eyebrow">
+        Search error
+      </div>
+
+      <h2>
+        We couldn't complete the search.
+      </h2>
+
+      <p class="detail-lede">
+        ${escapeHtml(error.message)}
+      </p>
+
+      <button class="back" onclick="showHome()">
+        ← Back to search
+      </button>
+    `;
+  }
 }
 function openStory(key){
   const s=stories[key];
@@ -250,6 +343,34 @@ function showLevel(view,idx){
   const root=document.getElementById(view==='story'?'storyView':'discoverView');
   root.querySelectorAll('.level').forEach((x,i)=>x.classList.toggle('active',i===idx));
   root.querySelectorAll('.level-nav button').forEach((x,i)=>x.classList.toggle('active',i===idx));
+}function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatSearchOutput(text) {
+  if (!text) {
+    return `
+      <div class="empty">
+        No results were returned.
+      </div>
+    `;
+  }
+
+  return `
+    <div style="
+      white-space: pre-wrap;
+      color: #4f5662;
+      font-size: 15px;
+      line-height: 1.7;
+    ">
+      ${escapeHtml(text)}
+    </div>
+  `;
 }
 </script>
 </body>
