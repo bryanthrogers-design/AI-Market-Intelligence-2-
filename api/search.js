@@ -162,21 +162,18 @@ Return only legitimate developments supported by web evidence.
       });
     }
 
-    const data = await response.json();
+ const data = await response.json();
 
-    return res.status(200).json({
-      success: true,
-      query,
-      mode,
-      answer: data.output_text || ""
-    });
+const answer =
+  data.output
+    ?.flatMap(item => item.content || [])
+    ?.filter(item => item.type === "output_text")
+    ?.map(item => item.text)
+    ?.join("\n") || "";
 
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      error: "Search failed.",
-      details: error.message
-    });
-  }
-};
+return res.status(200).json({
+  success: true,
+  query,
+  mode,
+  answer
+});
