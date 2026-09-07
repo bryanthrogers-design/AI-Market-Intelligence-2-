@@ -164,18 +164,29 @@ if (!response.ok) {
   });
 }
 
- const data = await response.json();
+const data = await response.json();
 
-const answer =
-  data.output
-    ?.flatMap(item => item.content || [])
-    ?.filter(item => item.type === "output_text")
-    ?.map(item => item.text)
-    ?.join("\n") || "";
+let answer = "";
+
+if (Array.isArray(data.output)) {
+  for (const item of data.output) {
+    if (!Array.isArray(item.content)) continue;
+
+    for (const content of item.content) {
+      if (
+        content &&
+        content.type === "output_text" &&
+        typeof content.text === "string"
+      ) {
+        answer += content.text + "\n";
+      }
+    }
+  }
+}
 
 return res.status(200).json({
   success: true,
   query,
   mode,
-  answer
+  answer: answer.trim()
 });
