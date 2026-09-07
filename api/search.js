@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Method not allowed"
@@ -28,18 +28,18 @@ export default async function handler(req, res) {
         : "Perform a focused, efficient search.";
 
     const prompt = `
-You are the intelligence engine for an AI news and research platform.
+You are the intelligence engine for an AI news and research intelligence platform.
 
 The user's question is:
 
 "${query}"
 
-Search the web and identify the strongest current AI-related developments that actually answer the user's question.
-
 ${searchDepth}
 
 CORE RULE:
+
 More information is not better information.
+
 Better information is information that answers the question accurately,
 with enough context to make it useful.
 
@@ -47,16 +47,20 @@ SEARCH AGGRESSIVELY.
 REJECT NARROWLY.
 RANK INTELLIGENTLY.
 
-Find approximately 10 serious candidate developments internally, then return
-only the strongest legitimate results.
+Find approximately 10 serious candidate developments internally.
 
-A DEVELOPMENT is the underlying event or storyline, not an individual article.
+Then return only the strongest legitimate results.
 
-Multiple articles covering the same event should be treated as one development.
+A DEVELOPMENT is the underlying event or storyline,
+not an individual article.
+
+Multiple articles covering the same event should be treated
+as one development.
 
 Do NOT manufacture stories simply to fill space.
 
 Reject only:
+
 - material unrelated to the user's question
 - AI mentions that are merely incidental
 - spam or obvious SEO filler
@@ -64,8 +68,8 @@ Reject only:
 - unsupported claims
 - material with no actual development
 
-Do not automatically reject unusual or emerging stories if they have genuine
-potential significance.
+Do not automatically reject unusual or emerging stories
+if they have genuine potential significance.
 
 For every final result determine:
 
@@ -80,10 +84,12 @@ For every final result determine:
 9. Freshness classification
 
 NEWS STRENGTH:
-Measure how strong or important the development is independently of the user's
-question.
+
+Measure how strong or important the development is
+independently of the user's question.
 
 Consider:
+
 - concrete development
 - potential significance
 - freshness
@@ -93,26 +99,36 @@ Consider:
 - evidence depth
 
 QUERY USEFULNESS:
-Measure how useful the development is specifically for the user's question.
 
-FRESHNESS must be event-based rather than simply publication-date based.
+Measure how useful the development is specifically
+for the user's question.
+
+FRESHNESS must be event-based rather than simply
+publication-date based.
 
 Use one of:
-- NEW
-- BREAKING
-- UPDATED
-- DEVELOPING
-- EMERGING
-- BACKGROUND
-- DORMANT
+
+NEW
+BREAKING
+UPDATED
+DEVELOPING
+EMERGING
+BACKGROUND
+DORMANT
 
 SOURCE QUALITY:
+
 Prefer:
-1. Government, court, legislation, university, research, company or regulatory sources
+
+1. Government, court, legislation, university, research,
+company or regulatory sources
+
 2. Reuters, AP, major newspapers and established broadcasters
+
 3. Established trade and industry publications
 
-Treat aggregators and low-quality sources primarily as discovery sources.
+Treat aggregators and low-quality sources primarily
+as discovery sources.
 
 Return only legitimate developments supported by web evidence.
 `;
@@ -163,4 +179,4 @@ Return only legitimate developments supported by web evidence.
       details: error.message
     });
   }
-}
+};
