@@ -153,14 +153,16 @@ Return only legitimate developments supported by web evidence.
       }
     );
 
-    if (!response.ok) {
-      const errorText = await response.text();
+if (!response.ok) {
+  const errorText = await response.text();
 
-      return res.status(response.status).json({
-        error: "OpenAI request failed.",
-        details: errorText
-      });
-    }
+  console.error("OPENAI ERROR:", errorText);
+
+  return res.status(response.status).json({
+    error: "OpenAI request failed.",
+    details: errorText
+  });
+}
 
  const data = await response.json();
 
